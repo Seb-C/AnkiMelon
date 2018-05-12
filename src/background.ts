@@ -1,6 +1,12 @@
-import Word from './classes/Word.js';
+import Word from './classes/Word.ts';
+import {
+    Translation as ApiHistoryTranslation,
+    Word as ApiHistoryWord,
+    Result as ApiHistoryResult,
+} from './interfaces/ApiHistory.ts';
+import { Word as ApiLookupWord } from './interfaces/ApiLookup.ts';
 
-function catchRequest(url) {
+function catchRequest(url: string): Promise<any> {
     return new Promise((resolve, reject) => {
         browser.webRequest.onBeforeRequest.addListener(request => {
             var stream = browser.webRequest.filterResponseData(request.requestId);
@@ -21,15 +27,15 @@ function catchRequest(url) {
                 }
             };
             stream.onerror = event => {
-                reject(filter.error);
+                reject(stream.error);
             };
         }, {urls: [url]}, ["blocking"]);
     });
 }
 
-function createWordFromHistoryFormat(wordData) {
-    var translations = [];
-    wordData.phrase.translations.forEach(lang => {
+function createWordFromHistoryFormat(wordData: ApiHistoryWord): Word {
+    var translations: Array<string> = [];
+    wordData.phrase.translations.forEach((lang: ApiHistoryTranslation) => {
         if (lang.language == 'en') {
             translations.push(...lang.translations);
         }
@@ -42,7 +48,7 @@ function createWordFromHistoryFormat(wordData) {
     );
 }
 
-function createWordFromLookupFormat(wordData) {
+function createWordFromLookupFormat(wordData: ApiLookupWord): Word {
     return new Word(
         wordData.originalPhrase,
         wordData.phoneticText,
@@ -50,24 +56,28 @@ function createWordFromLookupFormat(wordData) {
     );
 }
 
-function addWordToAnki(word) {
-    console.log('add', word);
+function addWordToAnki(word: Word): Promise<Word> {
+    return new Promise((resolve, reject) => {
+        console.log('add', word);
+    });
 }
 
-function incrementAnkiLookupCounter(word) {
-    console.log('increment', word);
+function incrementAnkiLookupCounter(word: Word): Promise<Word> {
+    return new Promise((resolve, reject) => {
+        console.log('increment', word);
+    });
 }
 
 catchRequest("*://animelon.com/api/*/translationHistoryAll/jp*")
-    .then(data => Promise.all(data.resArray.map(
-        wordData => Promise.resolve(createWordFromHistoryFormat(wordData))
+    .then((data: ApiHistoryResult) => Promise.all(data.resArray.map(
+        (wordData: ApiHistoryWord) => Promise.resolve(createWordFromHistoryFormat(wordData))
             .then(addWordToAnki)
-            .then(word => console.log('Added word to Anki from history', word))
+            .then((word: Word) => console.log('Added word to Anki from history', word))
     )))
-    .then(words => console.log('Added words to Anki from history', words);
+    .then((words: any) => console.log('Added all words to Anki from history', words));
 
 catchRequest("*://animelon.com/api/translationService/translate/")
     .then(createWordFromLookupFormat)
     .then(addWordToAnki)
     .then(incrementAnkiLookupCounter)
-    .then(word => console.log('Added word to Anki from lookup: ', word));
+    .then((word: Word) => console.log('Added word to Anki from lookup: ', word));
