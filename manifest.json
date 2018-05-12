@@ -1,26 +1,26 @@
 {
-    "manifest_version": 2,
-    "name": "AnkiMelon",
-    "version": "1.0",
-    "description": "Automatically synchronizes your Animelon vocabulary with Anki!",
-    "content_scripts": [
-        {
-            "matches": [
-                "*://*.animelon.com/*"
-            ],
-            "js": [
-                "build/page.js"
-            ]
-        }
-    ],
-    "background": {
-        "scripts": [
-            "build/background.js"
-        ]
-    },
-    "permissions": [
-        "webRequestBlocking",
-        "webRequest",
-        "*://animelon.com/"
+  "manifest_version": 2,
+  "name": "AnkiMelon",
+  "version": "1.0",
+  "description": "Automatically synchronizes your Animelon vocabulary with Anki!",
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.animelon.com/*"
+      ],
+      "js": [
+        "build/page.js"
+      ]
+    }
+  ],
+  "background": {
+    "scripts": [
+      "build/background.js"
     ]
+  },
+  "permissions": [
+    "webRequestBlocking",
+    "webRequest",
+    "*://animelon.com/"
+  ]
 }

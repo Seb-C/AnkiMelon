@@ -1,23 +1,23 @@
 export interface Phonetic {
-    text: string;
+	text: string;
 }
 
 export interface Translation {
-    language: string;
-    translations: Array<string>;
+	language: string;
+	translations: Array<string>;
 }
 
 export interface Phrase {
-    phonetics: Phonetic;
-    translations: Array<Translation>;
+	phonetics: Phonetic;
+	translations: Array<Translation>;
 }
 
 export interface Word {
-    _id: string;
-    phrase: Phrase;
+	_id: string;
+	phrase: Phrase;
 }
 
 export interface Result {
-    error: string;
-    resArray: Array<Word>;
+	error: string;
+	resArray: Array<Word>;
 }
