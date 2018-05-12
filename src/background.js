@@ -31,16 +31,43 @@ function createWordFromHistoryFormat(wordData) {
     var translations = [];
     wordData.phrase.translations.forEach(lang => {
         if (lang.language == 'en') {
-            translations = translations.push(...lang.translations);
+            translations.push(...lang.translations);
         }
     });
 
     return new Word(
         wordData._id,
-        wordData.phrase.phonetics.text,
+        wordData.phrase.phonetics.text || null,
         translations
     );
 }
 
+function createWordFromLookupFormat(wordData) {
+    return new Word(
+        wordData.originalPhrase,
+        wordData.phoneticText,
+        wordData.data
+    );
+}
+
+function addWordToAnki(word) {
+    console.log('add', word);
+}
+
+function incrementAnkiLookupCounter(word) {
+    console.log('increment', word);
+}
+
 catchRequest("*://animelon.com/api/*/translationHistoryAll/jp*")
-    .then(data => data.resArray.forEach(createWordFromHistoryFormat));
+    .then(data => Promise.all(data.resArray.map(
+        wordData => Promise.resolve(createWordFromHistoryFormat(wordData))
+            .then(addWordToAnki)
+            .then(word => console.log('Added word to Anki from history', word))
+    )))
+    .then(words => console.log('Added words to Anki from history', words);
+
+catchRequest("*://animelon.com/api/translationService/translate/")
+    .then(createWordFromLookupFormat)
+    .then(addWordToAnki)
+    .then(incrementAnkiLookupCounter)
+    .then(word => console.log('Added word to Anki from lookup: ', word));
