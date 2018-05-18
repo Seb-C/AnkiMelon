@@ -21,6 +21,12 @@
   "permissions": [
     "webRequestBlocking",
     "webRequest",
-    "*://animelon.com/"
-  ]
+    "storage",
+    "*://animelon.com/",
+    "http://localhost:8765/"
+  ],
+  "options_ui": {
+    "page": "views/options.html",
+    "browser_style": true
+  }
 }

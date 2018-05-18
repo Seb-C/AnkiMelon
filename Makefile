@@ -1,3 +1,5 @@
 all:
-	npm install
 	npm run webpack
+
+init:
+	npm install

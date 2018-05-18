@@ -3,8 +3,8 @@ import {
 	Translation as ApiHistoryTranslation,
 	Word as ApiHistoryWord,
 	Result as ApiHistoryResult,
-} from './interfaces/ApiHistory.ts';
-import { Word as ApiLookupWord } from './interfaces/ApiLookup.ts';
+} from './interfaces/Api/Animelon/History.ts';
+import { Word as ApiLookupWord } from './interfaces/Api/Animelon/Lookup.ts';
 
 function catchRequest(url: string): Promise<any> {
 	return new Promise((resolve, reject) => {
@@ -67,6 +67,8 @@ function incrementAnkiLookupCounter(word: Word): Promise<Word> {
 		console.log('increment', word);
 	});
 }
+
+// TODO are each promise used multiple times here?
 
 catchRequest("*://animelon.com/api/*/translationHistoryAll/jp*")
 	.then((data: ApiHistoryResult) => Promise.all(data.resArray.map(
