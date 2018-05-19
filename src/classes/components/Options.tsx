@@ -4,10 +4,10 @@ import OptionsProps from '../../interfaces/OptionsProps.ts';
 import DeckSelector from './DeckSelector.tsx';
 import CardTypeSelector from './CardTypeSelector.tsx';
 import WordFieldSelector from './WordFieldSelector.tsx';
-//import TranslationFieldSelector from './TranslationFieldSelector.tsx';
-//import RomajiFieldSelector from './RomajiFieldSelector.tsx';
-//import HiraganaFieldSelector from './HiraganaFieldSelector.tsx';
-//import FuriganaFieldSelector from './FuriganaFieldSelector.tsx';
+import TranslationFieldSelector from './TranslationFieldSelector.tsx';
+import RomajiFieldSelector from './RomajiFieldSelector.tsx';
+import HiraganaFieldSelector from './HiraganaFieldSelector.tsx';
+import FuriganaFieldSelector from './FuriganaFieldSelector.tsx';
 
 export default class Options extends React.Component<OptionsProps, any> {
 	constructor(props: OptionsProps) {
@@ -41,12 +41,11 @@ export default class Options extends React.Component<OptionsProps, any> {
 				<CardTypeSelector {...this.props} />
 			</label>
 			<label>
-				<span>Word:</span>
+				<span>Japanese Word:</span>
 				<WordFieldSelector {...this.props} />
 			</label>
-			{/*TODO*/}
-			{/*<label>
-				<span>Translation:</span>
+			<label>
+				<span>English translation:</span>
 				<TranslationFieldSelector {...this.props} />
 			</label>
 			<label>
@@ -60,7 +59,7 @@ export default class Options extends React.Component<OptionsProps, any> {
 			<label>
 				<span>Furigana:</span>
 				<FuriganaFieldSelector {...this.props} />
-			</label>*/}
+			</label>
 		</form>;
 	}
 }
