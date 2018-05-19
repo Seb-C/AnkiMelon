@@ -1,12 +1,16 @@
 var path = require('path');
 
 module.exports = {
+	mode: "production",
+	optimization: {
+		minimize: false
+	},
 	resolve: {
 		extensions: ['.ts', '.js', '.tsx', '.jsx'],
-        alias: {
-            'react': 'react-lite',
-            'react-dom': 'react-lite'
-        }
+		alias: {
+			'react': 'react-lite',
+			'react-dom': 'react-lite'
+		}
 	},
 	module: {
 		rules: [

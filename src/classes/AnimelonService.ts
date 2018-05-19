@@ -7,8 +7,8 @@ import {
 	Result as ApiHistoryResult,
 } from '../interfaces/Api/Animelon/History.ts';
 
-type OnSuccess = (data: any) => void;
 type OnError = (error: string) => void;
+type OnSuccess = (data: any, onError: OnError) => void;
 
 export default class AnimelonService {
 	private readonly HISTORY_URL = "*://animelon.com/api/*/translationHistoryAll/jp*";
@@ -21,8 +21,8 @@ export default class AnimelonService {
 	}
 
 	setupRequestHandlers(onError: OnError) {
-		this.onRequest(this.HISTORY_URL, this.handleHistoryResult, onError);
-		this.onRequest(this.LOOKUP_URL, this.handleLookupResult, onError);
+		this.onRequest(this.HISTORY_URL, this.handleHistoryResult.bind(this), onError);
+		this.onRequest(this.LOOKUP_URL, this.handleLookupResult.bind(this), onError);
 	}
 
 	onRequest(url: string, onSuccess: OnSuccess, onError: OnError) {
@@ -41,7 +41,7 @@ export default class AnimelonService {
 				if (resultData && resultData.error) {
 					onError(resultData.error);
 				} else {
-					onSuccess(resultData);
+					onSuccess(resultData, onError);
 				}
 			};
 			stream.onerror = event => {
@@ -73,13 +73,15 @@ export default class AnimelonService {
 		);
 	}
 
-	handleHistoryResult(data: ApiHistoryResult) {
+	handleHistoryResult(data: ApiHistoryResult, onError: OnError) {
 		return Promise.all(data.resArray.map((wordData: ApiHistoryWord) => {
 			return this.anki.addWord(this.createWordFromHistoryFormat(wordData));
-		}));
+		}))
+			.catch(onError);
 	}
 
-	handleLookupResult(wordData: ApiLookupWord) {
-		return this.anki.addWord(this.createWordFromLookupFormat(wordData));
+	handleLookupResult(wordData: ApiLookupWord, onError: OnError) {
+		return this.anki.addWord(this.createWordFromLookupFormat(wordData))
+			.catch(onError);
 	}
 }

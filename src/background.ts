@@ -5,5 +5,12 @@ const anki = new AnkiConnection();
 const animelon = new AnimelonService(anki);
 
 animelon.setupRequestHandlers((error: string) => {
-	console.error(error); // TODO
+	console.error(error);
+	browser.notifications.create(null, {
+		type   : "basic",
+		title  : "AnkiMelon error!",
+		message: error,
+		//icon   : "",// TODO
+	});
 });
+
