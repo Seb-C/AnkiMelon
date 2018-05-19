@@ -116,6 +116,13 @@ export default class AnkiConnection {
 		return new Promise((resolve, reject) => {
 			// TODO
 			console.log('added word to anki', word);
+			console.log({
+				word: word.getWord(),
+				tran: word.getTranslationsAsString(),
+				rom: word.getRomaji(),
+				hira: word.getHiragana(),
+				furi: word.getFurigana(),
+			});
 		});
 	}
 }
