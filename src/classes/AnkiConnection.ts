@@ -1,3 +1,7 @@
+import Word from './Word.ts';
+
+type ErrorHandler = (error: string) => void
+
 type DecksApiResult = Array<string>;
 type DecksCallback = (decks: Array<string>) => void
 
@@ -12,7 +16,7 @@ export default class AnkiConnection {
 		return new Promise((resolve, reject) => {
 			const xhr = new XMLHttpRequest();
 			xhr.addEventListener('error', () => {
-				reject('failed to connect to AnkiConnect'); // TODO error message ?
+				reject('Failed to connect to Anki. Did you start it?');
 			});
 			xhr.addEventListener('load', () => {
 				try {
@@ -29,7 +33,12 @@ export default class AnkiConnection {
 
 			xhr.open('POST', 'http://localhost:8765/', true);
 			xhr.send(JSON.stringify({action, version: 5, params}));
-		});
+		}).catch(this.errorHandler);
+	}
+
+	private errorHandler: ErrorHandler = error => {};
+	public setErrorHandler(callback: ErrorHandler) {
+		this.errorHandler = callback;
 	}
 
 	private loadDecksBindings: Array<DecksCallback> = [];
@@ -101,5 +110,12 @@ export default class AnkiConnection {
 
 		// Done after calling it to avoid it being called twice
 		this.loadFieldsBindings.push(callback);
+	}
+
+	addWord(word: Word): Promise<Word> {
+		return new Promise((resolve, reject) => {
+			// TODO
+			console.log('added word to anki', word);
+		});
 	}
 }

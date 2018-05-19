@@ -10,9 +10,28 @@ import WordFieldSelector from './WordFieldSelector.tsx';
 //import FuriganaFieldSelector from './FuriganaFieldSelector.tsx';
 
 export default class Options extends React.Component<OptionsProps, any> {
+	constructor(props: OptionsProps) {
+		super(props);
+
+		this.state = {
+			error: null,
+		};
+
+		this.props.anki.setErrorHandler((error: string) => {
+			this.setState({error});
+		});
+	}
+
+	renderError() {
+		if (this.state.error !== null) {
+			return <div style={{color: 'red'}}>{this.state.error}</div>;
+		}
+	}
+
 	render() {
 		return <form>
 			<h1>Anki synchronization options</h1>
+			{this.renderError()}
 			<label className="browser-style-label">
 				<span>Deck:</span>
 				<DeckSelector {...this.props} />
@@ -25,6 +44,7 @@ export default class Options extends React.Component<OptionsProps, any> {
 				<span>Word:</span>
 				<WordFieldSelector {...this.props} />
 			</label>
+			{/*TODO*/}
 			{/*<label>
 				<span>Translation:</span>
 				<TranslationFieldSelector {...this.props} />
