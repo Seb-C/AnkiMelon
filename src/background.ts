@@ -10,7 +10,6 @@ animelon.setupRequestHandlers((error: string) => {
 		type   : "basic",
 		title  : "AnkiMelon error!",
 		message: error,
-		//icon   : "",// TODO
+		iconUrl: "icon.png",
 	});
 });
-

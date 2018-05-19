@@ -3,6 +3,9 @@
   "name": "AnkiMelon",
   "version": "1.0",
   "description": "Automatically synchronizes your Animelon vocabulary with Anki!",
+  "icons": {
+    "128": "icon.png"
+  },
   "content_scripts": [
     {
       "matches": [
