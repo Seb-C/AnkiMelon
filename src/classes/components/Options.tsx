@@ -1,6 +1,6 @@
 import ReactDOM from 'react-dom';
 import React from 'react';
-import OptionsProps from '../../interfaces/OptionsProps.ts';
+import OptionsComponentsProps from '../../interfaces/OptionsComponentsProps.ts';
 import DeckSelector from './DeckSelector.tsx';
 import CardTypeSelector from './CardTypeSelector.tsx';
 import WordFieldSelector from './WordFieldSelector.tsx';
@@ -9,8 +9,8 @@ import RomajiFieldSelector from './RomajiFieldSelector.tsx';
 import HiraganaFieldSelector from './HiraganaFieldSelector.tsx';
 import FuriganaFieldSelector from './FuriganaFieldSelector.tsx';
 
-export default class Options extends React.Component<OptionsProps, any> {
-	constructor(props: OptionsProps) {
+export default class Options extends React.Component<OptionsComponentsProps, any> {
+	constructor(props: OptionsComponentsProps) {
 		super(props);
 
 		this.state = {

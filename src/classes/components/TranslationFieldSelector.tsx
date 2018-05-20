@@ -1,9 +1,9 @@
 import ReactDOM from 'react-dom';
 import React from 'react';
-import OptionsProps from '../../interfaces/OptionsProps.ts';
+import OptionsComponentsProps from '../../interfaces/OptionsComponentsProps.ts';
 
-export default class TranslationFieldSelector extends React.Component<OptionsProps, any> {
-	constructor(props: OptionsProps) {
+export default class TranslationFieldSelector extends React.Component<OptionsComponentsProps, any> {
+	constructor(props: OptionsComponentsProps) {
 		super(props);
 
 		this.state = {

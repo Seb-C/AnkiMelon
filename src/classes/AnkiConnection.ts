@@ -1,4 +1,6 @@
 import Word from './Word.ts';
+import OptionsStore from './OptionsStore.ts';
+import Options from '../interfaces/Options.ts';
 
 type ErrorHandler = (error: string) => void
 
@@ -112,16 +114,45 @@ export default class AnkiConnection {
 		this.loadFieldsBindings.push(callback);
 	}
 
-	addWord(word: Word): Promise<Word> {
-		return new Promise((resolve, reject) => {
-			// TODO
-			console.log('added word to anki', word);
-			console.log({
-				word: word.getWord(),
-				tran: word.getTranslationsAsString(),
-				rom: word.getRomaji(),
-				hira: word.getHiragana(),
-				furi: word.getFurigana(),
+	addWord(word: Word, store: OptionsStore): Promise<Word> {
+		store.getOptions().then((options: Options) => {
+			return this.query('findNotes', {
+				"query": '"' + (
+					`${options.wordField}:${word.getWord()}`
+						.replace(/"/g, '\\"')
+				) + '"',
+			}).then((foundIds: Array<number>) => {
+				if (foundIds.length > 0) {
+					return this.query('addTags', {
+						notes: foundIds,
+						tags: "Animelon",
+					});
+				} else {
+					var fields: any = {};
+					fields[options.wordField] = word.getWord();
+					fields[options.translationField] = word.getTranslationsAsString();
+					if (options.romajiField) {
+						fields[options.romajiField] = word.getRomaji();
+					}
+					if (options.hiraganaField) {
+						fields[options.hiraganaField] = word.getHiragana();
+					}
+					if (options.furiganaField) {
+						fields[options.furiganaField] = word.getFurigana();
+					}
+
+					// TODO
+					//return this.query('addNote', {
+					//	"note": {
+					//		"deckName": options.deck,
+					//		"modelName": options.cardType,
+					//		"fields": fields,
+					//		"tags": [
+					//			"Animelon"
+					//		],
+					//	},
+					//});
+				}
 			});
 		});
 	}

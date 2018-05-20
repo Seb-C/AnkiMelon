@@ -1,6 +1,7 @@
 import AnkiConnection from './AnkiConnection.ts';
+import Options from '../interfaces/Options.ts';
 
-export default class Store {
+export default class OptionsStore {
 	private readonly DEFAULT_DECK: string              = 'Default';
 	private readonly DEFAULT_CARD_TYPE: string         = 'Basic';
 	private readonly DEFAULT_WORD_FIELD: string        = 'Front';
@@ -14,15 +15,20 @@ export default class Store {
 		this.store = browser.storage.local;
 	}
 
-	private getOption(key: string, def: any = null): Promise<any> {
+	public getOptions(): Promise<Options> {
 		return this.store.get()
+			.then((options: any) => options as Options);
+	}
+
+	private getOption(key: string, def: any = null): Promise<any> {
+		return this.getOptions()
 			.then((options: any) => {
 				return options[key] || def;
 			});
 	}
-	private setOptions(newOptions: any) {
-		return this.store.get()
-			.then((oldOptions: any) => {
+	private setOptions(newOptions: Options) {
+		return this.getOptions()
+			.then((oldOptions: Options) => {
 				return this.store.set({...oldOptions, ...newOptions});
 			});
 	}
@@ -31,14 +37,14 @@ export default class Store {
 		return this.getOption('deck', this.DEFAULT_DECK);
 	}
 	setDeck(deck: string) {
-		this.setOptions({deck});
+		this.setOptions({deck} as Options);
 	}
 
 	getCardType(): Promise<string> {
 		return this.getOption('cardType', this.DEFAULT_CARD_TYPE);
 	}
 	setCardType(cardType: string) {
-		this.setOptions({cardType})
+		this.setOptions({cardType} as Options)
 			.then(() => this.anki.loadFields(cardType));
 	}
 
