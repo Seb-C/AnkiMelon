@@ -9,28 +9,33 @@ import {
 } from '../interfaces/Api/Animelon/History.ts';
 
 type OnError = (error: string) => void;
-type OnSuccess = (data: any, store: OptionsStore, onError: OnError) => void;
+type OnSuccess = (
+	data: any,
+	anki: AnkiConnection,
+	store: OptionsStore,
+	onError: OnError
+) => void;
 
 export default class AnimelonService {
 	private readonly HISTORY_URL = "*://animelon.com/api/*/translationHistoryAll/jp*";
 	private readonly LOOKUP_URL  = "*://animelon.com/api/translationService/translate/";
 
-	private anki: AnkiConnection;
-
-	constructor(anki: AnkiConnection) {
-		this.anki = anki;
-	}
-
-	setupRequestHandlers(store: OptionsStore, onError: OnError) {
+	setupRequestHandlers(
+		anki: AnkiConnection,
+		store: OptionsStore,
+		onError: OnError
+	) {
 		this.onRequest(
 			this.HISTORY_URL,
 			this.handleHistoryResult.bind(this),
+			anki,
 			store,
 			onError
 		);
 		this.onRequest(
 			this.LOOKUP_URL,
 			this.handleLookupResult.bind(this),
+			anki,
 			store,
 			onError
 		);
@@ -39,6 +44,7 @@ export default class AnimelonService {
 	onRequest(
 		url: string,
 		onSuccess: OnSuccess,
+		anki: AnkiConnection,
 		store: OptionsStore,
 		onError: OnError
 	) {
@@ -57,7 +63,7 @@ export default class AnimelonService {
 				if (resultData && resultData.error) {
 					onError(resultData.error);
 				} else {
-					onSuccess(resultData, store, onError);
+					onSuccess(resultData, anki, store, onError);
 				}
 			};
 			stream.onerror = event => {
@@ -76,7 +82,10 @@ export default class AnimelonService {
 
 		return new Word(
 			wordData._id,
-			wordData.phrase.phonetics.text || null,
+			(wordData.phrase.phonetics
+				? wordData.phrase.phonetics.text
+				: null
+			)|| null,
 			translations
 		);
 	}
@@ -91,25 +100,42 @@ export default class AnimelonService {
 
 	handleHistoryResult(
 		data: ApiHistoryResult,
+		anki: AnkiConnection,
 		store: OptionsStore,
 		onError: OnError
 	) {
 		return Promise.all(data.resArray.map((wordData: ApiHistoryWord) => {
-			return this.anki.addWord(
+			return anki.addWord(
 				this.createWordFromHistoryFormat(wordData),
 				store
-			);
-		})).catch(onError);
+			).then(this.notifyWebPageToUpdateWordStatus);
+		}))
+			.catch(onError);
 	}
 
 	handleLookupResult(
 		wordData: ApiLookupWord,
+		anki: AnkiConnection,
 		store: OptionsStore,
 		onError: OnError
 	) {
-		return this.anki.addWord(
+		return anki.addWord(
 			this.createWordFromLookupFormat(wordData),
 			store
-		).catch(onError);
+		)
+			.then(this.notifyWebPageToUpdateWordStatus)
+			.catch(onError);
+	}
+
+	notifyWebPageToUpdateWordStatus(word: Word): Promise<Word> {
+		return browser.tabs.query({
+			currentWindow: true,
+			active: true
+		}).then((tabs: Array<any>) => tabs.forEach((tab: any) => {
+			return browser.tabs.sendMessage(tab.id, {
+				action: "wordAddedToAnki",
+				payload: word.getWord(),
+			});
+		})).then(() => word);
 	}
 }

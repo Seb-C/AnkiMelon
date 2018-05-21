@@ -115,7 +115,7 @@ export default class AnkiConnection {
 	}
 
 	addWord(word: Word, store: OptionsStore): Promise<Word> {
-		store.getOptions().then((options: Options) => {
+		return store.getOptions().then((options: Options) => {
 			return this.query('findNotes', {
 				"query": '"' + (
 					`${options.wordField}:${word.getWord()}`
@@ -141,19 +141,18 @@ export default class AnkiConnection {
 						fields[options.furiganaField] = word.getFurigana();
 					}
 
-					// TODO
-					//return this.query('addNote', {
-					//	"note": {
-					//		"deckName": options.deck,
-					//		"modelName": options.cardType,
-					//		"fields": fields,
-					//		"tags": [
-					//			"Animelon"
-					//		],
-					//	},
-					//});
+					return this.query('addNote', {
+						"note": {
+							"deckName": options.deck,
+							"modelName": options.cardType,
+							"fields": fields,
+							"tags": [
+								"Animelon"
+							],
+						},
+					});
 				}
 			});
-		});
+		}).then(() => word);
 	}
 }
