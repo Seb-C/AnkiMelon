@@ -15,7 +15,7 @@ type FieldsCallback = (cardTypes: Array<string>) => void
 
 export default class AnkiConnection {
 	private query(action: string, params: any = {}): Promise<any> {
-		return new Promise((resolve, reject) => {
+		const query = new Promise((resolve, reject) => {
 			const xhr = new XMLHttpRequest();
 			xhr.addEventListener('error', () => {
 				reject('Failed to connect to Anki. Did you start it?');
@@ -35,10 +35,16 @@ export default class AnkiConnection {
 
 			xhr.open('POST', 'http://localhost:8765/', true);
 			xhr.send(JSON.stringify({action, version: 5, params}));
-		}).catch(this.errorHandler);
+		});
+
+		if (this.errorHandler !== null) {
+			return query.catch(this.errorHandler);
+		} else {
+			return query;
+		}
 	}
 
-	private errorHandler: ErrorHandler = error => {};
+	private errorHandler: ErrorHandler|null = null;
 	public setErrorHandler(callback: ErrorHandler) {
 		this.errorHandler = callback;
 	}
@@ -113,8 +119,15 @@ export default class AnkiConnection {
 		// Done after calling it to avoid it being called twice
 		this.loadFieldsBindings.push(callback);
 	}
+	public getFields(cardType: string): Promise<FieldsApiResult> {
+		if (this.loadFieldsLastResult === null) {
+			return this.loadFields(cardType);
+		} else {
+			return Promise.resolve(this.loadFieldsLastResult);
+		}
+	}
 
-	addWord(word: Word, store: OptionsStore): Promise<Word> {
+	public addWord(word: Word, store: OptionsStore): Promise<Word> {
 		return store.getOptions().then((options: Options) => {
 			return this.query('findNotes', {
 				"query": '"' + (
@@ -128,28 +141,35 @@ export default class AnkiConnection {
 						tags: "Animelon",
 					});
 				} else {
-					var fields: any = {};
-					fields[options.wordField] = word.getWord();
-					fields[options.translationField] = word.getTranslationsAsString();
-					if (options.romajiField) {
-						fields[options.romajiField] = word.getRomaji();
-					}
-					if (options.hiraganaField) {
-						fields[options.hiraganaField] = word.getHiragana();
-					}
-					if (options.furiganaField) {
-						fields[options.furiganaField] = word.getFurigana();
-					}
+					return this.getFields(options.cardType).then((cardTypeFields: FieldsApiResult) => {
+						var fields: any = {};
+						fields[options.wordField] = word.getWord();
+						fields[options.translationField] = word.getTranslationsAsString();
+						if (options.romajiField) {
+							fields[options.romajiField] = word.getRomaji();
+						}
+						if (options.hiraganaField) {
+							fields[options.hiraganaField] = word.getHiragana();
+						}
+						if (options.furiganaField) {
+							fields[options.furiganaField] = word.getFurigana();
+						}
 
-					return this.query('addNote', {
-						"note": {
-							"deckName": options.deck,
-							"modelName": options.cardType,
-							"fields": fields,
-							"tags": [
-								"Animelon"
-							],
-						},
+						if (!fields.hasOwnProperty(cardTypeFields[0])) {
+							// A note where the first field is empty is not allowed in Anki
+							fields[cardTypeFields[0]] = 'Animelon ' + word.getWord();
+						}
+
+						return this.query('addNote', {
+							"note": {
+								"deckName": options.deck,
+								"modelName": options.cardType,
+								"fields": fields,
+								"tags": [
+									"Animelon"
+								],
+							},
+						});
 					});
 				}
 			});
