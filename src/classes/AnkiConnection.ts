@@ -169,6 +169,14 @@ export default class AnkiConnection {
 									"Animelon"
 								],
 							},
+						}).catch ((error: string) => {
+							// TODO find a better way to handle this case
+							if (error.startsWith('Note is duplicate of existing note.')) {
+								console.log('Ignored error: ', error);
+								return Promise.resolve();
+							} else {
+								return Promise.reject(error);
+							}
 						});
 					});
 				}
