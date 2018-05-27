@@ -17,7 +17,13 @@ export default class OptionsStore {
 
 	public getOptions(): Promise<Options> {
 		return this.store.get()
-			.then((options: any) => options as Options);
+			.then((options: any) => ({
+				deck            : this.DEFAULT_DECK,
+				cardType        : this.DEFAULT_CARD_TYPE,
+				wordField       : this.DEFAULT_WORD_FIELD,
+				translationField: this.DEFAULT_TRANSLATION_FIELD,
+				...options,
+			}) as Options);
 	}
 
 	private getOption(key: string, def: any = null): Promise<any> {
