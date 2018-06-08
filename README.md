@@ -3,6 +3,8 @@
 [AnkiMelon](https://github.com/Seb-C/AnkiMelon) is a simple Firefox extension which allows you to have your
 vocabulary lookups from [Animelon](https://animelon.com/) automatically added to Anki.
 
+If you are not a developer and just would like to use it, please find it [here](https://addons.mozilla.org/en-US/firefox/addon/ankimelon/).
+
 # Installation
 
 1. Have Anki installed
